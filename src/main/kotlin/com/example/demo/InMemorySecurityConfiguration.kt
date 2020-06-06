@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.core.userdetails.User
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import javax.sql.DataSource
 
@@ -20,6 +19,15 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .jdbcAuthentication()
                 .dataSource(createDataSource())
                 .passwordEncoder(passwordEncoder())
+                .usersByUsernameQuery(
+                        "SELECT id, user_name, user_password" +
+                                "FROM authority.\"user\" WHERE id = ?;"
+                )
+                .authoritiesByUsernameQuery(
+                        "select authentication.\"user\".user_name, authentication.\"authority\".authority \n" +
+                                "from authentication.\"authority\", authentication.\"user\" \n" +
+                                "where authentication.\"authority\".user_id = authentication.\"user\".id and user_name = 'maksim';"
+                )
     }
 
     override fun configure(http: HttpSecurity) {
