@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class InMemoryController {
+class AuthController {
 
     @GetMapping("/")
     fun index(): String = "Unprotected method for anyone to use"

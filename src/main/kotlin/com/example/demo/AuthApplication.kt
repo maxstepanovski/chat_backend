@@ -5,8 +5,8 @@ import org.springframework.boot.runApplication
 
 
 @SpringBootApplication
-class InMemoryAuthApplication
+class AuthApplication
 
 fun main(args: Array<String>) {
-    runApplication<InMemoryAuthApplication>(*args)
+    runApplication<AuthApplication>(*args)
 }
