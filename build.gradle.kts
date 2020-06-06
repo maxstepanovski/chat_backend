@@ -16,7 +16,8 @@ repositories {
 }
 
 dependencies {
-//    implementation("com.h2database.h2:1.4.200")
+    implementation("org.postgresql:postgresql:42.2.6")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-test")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
