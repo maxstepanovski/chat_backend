@@ -1,7 +1,6 @@
 package com.example.demo
 
 import org.postgresql.ds.PGSimpleDataSource
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -9,53 +8,57 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import javax.sql.DataSource
 
 @Configuration
 @EnableWebSecurity
 class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
-    @Autowired
-    private lateinit var dataSource: DataSource
-
-    @Autowired
-    private lateinit var passwordEncoder: PasswordEncoder
-
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth
                 .jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(passwordEncoder)
+                .dataSource(dataSource())
+                .passwordEncoder(passwordEncoder())
+                .rolePrefix("ROLE_")
                 .usersByUsernameQuery(
-                        "SELECT id, user_name, user_password" +
-                                "FROM authority.\"user\" WHERE id = ?;"
+                        "SELECT user_name, user_password, enabled " +
+                                "FROM authentication.user WHERE user_name = ?"
                 )
                 .authoritiesByUsernameQuery(
-                        "select authentication.\"user\".user_name, authentication.\"authority\".authority \n" +
-                                "from authentication.\"authority\", authentication.\"user\" \n" +
-                                "where authentication.\"authority\".user_id = authentication.\"user\".id and user_name = ?;"
+                        "select authentication.user.user_name, authentication.authority.authority " +
+                                "from authentication.authority, authentication.user " +
+                                "where authentication.authority.user_id = authentication.user.id and user_name = ?"
                 )
     }
 
     override fun configure(http: HttpSecurity) {
         http
-                .formLogin()
-                .successForwardUrl("/")
-
-        http
+                .formLogin().defaultSuccessUrl("/common/info", true)
+                .and().rememberMe()
+                .and().logout().logoutSuccessUrl("/")
+                .and().csrf()
+                .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/admin/*").hasRole(Role.ADMIN.alias)
-                .antMatchers("/user/*").hasRole(Role.USER.alias)
+                .antMatchers("/register").permitAll()
+                .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
+                .antMatchers("/${Role.USER.alias}/*").hasRole(Role.USER.alias)
                 .antMatchers("/common/*").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
+                .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin()
+
+        http
+                .sessionManagement()
+                .maximumSessions(1)
     }
 
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
 
     @Bean
-    fun createDataSource(): DataSource {
+    fun dataSource(): DataSource {
         val dataSource = PGSimpleDataSource()
         dataSource.setUrl("jdbc:postgresql://localhost:5432/postgres")
         dataSource.user = "postgres"
