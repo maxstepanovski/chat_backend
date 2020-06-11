@@ -2,7 +2,6 @@ package com.example.demo
 
 import com.example.demo.data.AuthRepository
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
@@ -21,12 +20,11 @@ class AuthController(private val repository: AuthRepository) {
     @GetMapping("/common/info")
     fun commonInfo(): String = "You can see this if you are either an admin or a user"
 
-    @PostMapping("/register")
+    @GetMapping("/register")
     fun registerUser(
             @RequestParam(name = "user_name") userName: String,
             @RequestParam(name = "user_password") userPassword: String
     ): String {
-        repository.createUser(userName, userPassword)
-        return "successful registration!"
+        return repository.createUser(userName, userPassword)
     }
 }
