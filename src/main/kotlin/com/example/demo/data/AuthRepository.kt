@@ -14,8 +14,11 @@ class AuthRepository constructor(
 ) {
 
     fun createUser(userName: String, userPassword: String): String {
+        if (isUserNameUnique(userName).not()) {
+            return "user with name $userName is already registered!"
+        }
         var connection: Connection? = null
-        var statement: PreparedStatement? = null
+        var statement: PreparedStatement
         try {
             connection = dataSource.connection
             connection.autoCommit = false
@@ -46,4 +49,21 @@ class AuthRepository constructor(
         return "successful registration!"
     }
 
+    private fun isUserNameUnique(userName: String): Boolean {
+        var connection: Connection? = null
+        try {
+            connection = dataSource.connection
+            connection.autoCommit = false
+            val rs = connection.createStatement().executeQuery("select * from authentication.user where user_name = '$userName'")
+            if (rs.next()) {
+                return false
+            }
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            return false
+        } finally {
+            connection?.close()
+        }
+        return true
+    }
 }
