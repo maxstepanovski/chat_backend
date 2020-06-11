@@ -17,36 +17,59 @@ class AuthRepository constructor(
         if (isUserNameUnique(userName).not()) {
             return "user with name $userName is already registered!"
         }
+        val userError = createUserRecord(userName, userPassword)
+        if (userError != null) {
+            return userError
+        }
+        val authError = createAuthorityRecord(userName)
+        if (authError != null) {
+            return authError
+        }
+        return "successful registration!"
+    }
+
+    private fun createUserRecord(userName: String, userPassword: String): String? {
         var connection: Connection? = null
-        var statement: PreparedStatement
         try {
             connection = dataSource.connection
             connection.autoCommit = false
-            statement = connection.prepareStatement(
+            val createUserStatement = connection.prepareStatement(
                     "insert into authentication.user (user_name, user_password, enabled) values (?, ?, true)"
             )
-            statement.setString(1, userName)
-            statement.setString(2, passwordEncoder.encode(userPassword))
-            statement.executeUpdate()
+            createUserStatement.setString(1, userName)
+            createUserStatement.setString(2, passwordEncoder.encode(userPassword))
+            createUserStatement.executeUpdate()
             connection.commit()
-            statement.close()
-
-            statement = connection.prepareStatement(
-                    "insert into authentication.authority (user_id, authority) values ((select id from authentication.user where user_name = ?), ?)"
-            )
-            statement.setString(1, userName)
-            statement.setString(2, Role.USER.alias)
-            statement.executeUpdate()
-            connection.commit()
-            statement.close()
-
+            createUserStatement.close()
         } catch (ex: Throwable) {
             ex.printStackTrace()
             return "registration error!\n\n" + ex.stackTrace
         } finally {
             connection?.close()
         }
-        return "successful registration!"
+        return null
+    }
+
+    private fun createAuthorityRecord(userName: String): String? {
+        var connection: Connection? = null
+        try {
+            connection = dataSource.connection
+            connection.autoCommit = false
+            val createAuthoritySt = connection.prepareStatement(
+                    "insert into authentication.authority (user_id, authority) values ((select id from authentication.user where user_name = ?), ?)"
+            )
+            createAuthoritySt.setString(1, userName)
+            createAuthoritySt.setString(2, Role.USER.alias)
+            createAuthoritySt.executeUpdate()
+            connection.commit()
+            createAuthoritySt.close()
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+            return "registration error!\n\n" + ex.stackTrace
+        } finally {
+            connection?.close()
+        }
+        return null
     }
 
     private fun isUserNameUnique(userName: String): Boolean {
