@@ -36,7 +36,6 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .formLogin().defaultSuccessUrl("/common/info", true)
                 .and().rememberMe()
                 .and().logout().logoutSuccessUrl("/")
-                .and().csrf()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
@@ -44,14 +43,6 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
                 .antMatchers("/${Role.USER.alias}/*").hasRole(Role.USER.alias)
                 .antMatchers("/common/*").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
-                .and()
-                .headers()
-                .frameOptions()
-                .sameOrigin()
-
-        http
-                .sessionManagement()
-                .maximumSessions(1)
     }
 
     @Bean
