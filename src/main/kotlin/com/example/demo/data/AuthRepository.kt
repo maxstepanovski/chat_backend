@@ -7,7 +7,6 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import javax.sql.DataSource
 
-@Component
 class AuthRepository constructor(
         private val dataSource: DataSource,
         private val passwordEncoder: PasswordEncoder
@@ -26,6 +25,26 @@ class AuthRepository constructor(
             return authError
         }
         return "successful registration!"
+    }
+
+    fun readUserAuthorities(userName: String): MutableList<String> {
+        val result = mutableListOf<String>()
+        var connection: Connection? = null
+        try {
+            connection = dataSource.connection
+            connection.autoCommit = false
+            val rs = connection.createStatement().executeQuery(
+                    "select authority from authentication.authority where user_id = (select id from authentication.user where user_name = '$userName')"
+            )
+            while (rs.next()) {
+                rs.getString("authority").let { result.add(it) }
+            }
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+        } finally {
+            connection?.close()
+            return result
+        }
     }
 
     private fun createUserRecord(userName: String, userPassword: String): String? {
