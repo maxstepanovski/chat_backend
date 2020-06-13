@@ -26,7 +26,6 @@ class JwtAuthenticationFilter(
     init {
         authenticationManager = authManager
         setFilterProcessesUrl("/login")
-        setPostOnly(false)
     }
 
     override fun successfulAuthentication(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain, authResult: Authentication) {

@@ -6,6 +6,7 @@ import com.example.demo.filters.JwtAuthorizationFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -79,8 +80,8 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/register").permitAll()
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/register").permitAll()
                 .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
                 .antMatchers("/${Role.USER.alias}/*").hasRole(Role.USER.alias)
                 .antMatchers("/common/*").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
