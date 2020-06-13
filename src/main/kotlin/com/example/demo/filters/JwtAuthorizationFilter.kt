@@ -1,8 +1,9 @@
 package com.example.demo.filters
 
+import com.example.demo.AUTH_PREFIX
+import com.example.demo.ROLE_PREFIX
 import com.example.demo.data.AuthRepository
 import io.jsonwebtoken.Jwts
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -48,7 +49,7 @@ class JwtAuthorizationFilter(
                 return null
             }
 
-            val authorities = repository.readUserAuthorities(userName).map { SimpleGrantedAuthority(it) }
+            val authorities = repository.readUserAuthorities(userName).map { SimpleGrantedAuthority("$ROLE_PREFIX$it") }
 
             return UsernamePasswordAuthenticationToken(userName, null, authorities)
         } catch (ex: Throwable) {
@@ -57,5 +58,3 @@ class JwtAuthorizationFilter(
         return null
     }
 }
-
-private const val AUTH_PREFIX = "Bearer "

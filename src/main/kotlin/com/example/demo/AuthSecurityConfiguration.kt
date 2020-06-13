@@ -46,7 +46,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .jdbcAuthentication()
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder)
-                .rolePrefix("ROLE_")
+                .rolePrefix(ROLE_PREFIX)
                 .usersByUsernameQuery(
                         "SELECT user_name, user_password, enabled " +
                                 "FROM authentication.user WHERE user_name = ?"
@@ -60,25 +60,23 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
         http
-//                .cors()
-//                .and()
-                .httpBasic()
+                .cors()
                 .and()
-//                .csrf()
-//                .disable()
-//                .addFilter(
-//                        JwtAuthorizationFilter(
-//                                authRepository, secretKey, authenticationManager()
-//                        )
-//                )
-//                .addFilter(
-//                        JwtAuthenticationFilter(
-//                                jwtAudience, jwtIssuer, jwtType, secretKey, authenticationManager()
-//                        )
-//                )
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
+                .csrf()
+                .disable()
+                .addFilter(
+                        JwtAuthenticationFilter(
+                                jwtAudience, jwtIssuer, jwtType, secretKey, authenticationManager()
+                        )
+                )
+                .addFilter(
+                        JwtAuthorizationFilter(
+                                authRepository, secretKey, authenticationManager()
+                        )
+                )
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
@@ -92,3 +90,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
 enum class Role(val alias: String) {
     ADMIN("admin"), USER("user")
 }
+
+const val AUTH_PREFIX = "Bearer "
+const val ROLE_PREFIX = "ROLE_"
+const val TOKEN_LIFESPAN_MS = 600_000

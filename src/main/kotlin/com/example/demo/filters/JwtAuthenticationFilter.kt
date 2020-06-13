@@ -1,8 +1,9 @@
 package com.example.demo.filters
 
+import com.example.demo.AUTH_PREFIX
+import com.example.demo.TOKEN_LIFESPAN_MS
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.security.Keys
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.Authentication
@@ -28,10 +29,6 @@ class JwtAuthenticationFilter(
         setPostOnly(false)
     }
 
-    override fun attemptAuthentication(request: HttpServletRequest?, response: HttpServletResponse?): Authentication {
-        return super.attemptAuthentication(request, response)
-    }
-
     override fun successfulAuthentication(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain, authResult: Authentication) {
         (authResult.principal as User).apply {
             val token = Jwts.builder()
@@ -40,9 +37,9 @@ class JwtAuthenticationFilter(
                     .setIssuer(jwtIssuer)
                     .setAudience(jwtAudience)
                     .setSubject(username)
-                    .setExpiration(Date(System.currentTimeMillis() + 300_000))
+                    .setExpiration(Date(System.currentTimeMillis() + TOKEN_LIFESPAN_MS))
                     .compact()
-            response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
+            response.addHeader(HttpHeaders.AUTHORIZATION, "$AUTH_PREFIX$token")
         }
     }
 }
