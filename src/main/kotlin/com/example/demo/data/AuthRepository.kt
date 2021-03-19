@@ -2,9 +2,7 @@ package com.example.demo.data
 
 import com.example.demo.Role
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Component
 import java.sql.Connection
-import java.sql.PreparedStatement
 import javax.sql.DataSource
 
 class AuthRepository constructor(

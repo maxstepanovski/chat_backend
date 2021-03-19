@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AuthController(private val repository: AuthRepository) {
 
-    @GetMapping("/")
+    @GetMapping("/index")
     fun index(): String = "Unprotected method for anyone to use"
 
     @GetMapping("/admin/info")
