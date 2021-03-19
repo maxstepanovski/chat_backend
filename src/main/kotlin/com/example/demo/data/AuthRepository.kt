@@ -10,19 +10,19 @@ class AuthRepository constructor(
         private val passwordEncoder: PasswordEncoder
 ) {
 
-    fun createUser(userName: String, userPassword: String): String {
+    fun createUser(userName: String, userPassword: String): Boolean {
         if (isUserNameUnique(userName).not()) {
-            return "user with name $userName is already registered!"
+            return false
         }
         val userError = createUserRecord(userName, userPassword)
         if (userError != null) {
-            return userError
+            return false
         }
         val authError = createAuthorityRecord(userName)
         if (authError != null) {
-            return authError
+            return false
         }
-        return "successful registration!"
+        return true
     }
 
     fun readUserAuthorities(userName: String): MutableList<String> {
