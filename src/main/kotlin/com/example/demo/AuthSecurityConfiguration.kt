@@ -85,6 +85,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
                 .antMatchers("/${Role.USER.alias}/*").hasRole(Role.USER.alias)
                 .antMatchers("/common/*").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
+                .antMatchers("/conversations").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
     }
 }
 
