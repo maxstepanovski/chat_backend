@@ -45,6 +45,26 @@ class AuthRepository constructor(
         }
     }
 
+    fun isUserExists(userName: String): Boolean {
+        var result = false
+        var connection: Connection? = null
+        try {
+            connection = dataSource.connection
+            connection.autoCommit = false
+            val rs = connection.createStatement().executeQuery(
+                    "select exists(select 1 from authentication.user where user_name = '$userName');"
+            )
+            while (rs.next()) {
+                result = rs.getBoolean("exists")
+            }
+        } catch (ex: Throwable) {
+            ex.printStackTrace()
+        } finally {
+            connection?.close()
+            return result
+        }
+    }
+
     private fun createUserRecord(userName: String, userPassword: String): String? {
         var connection: Connection? = null
         try {
