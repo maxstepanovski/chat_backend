@@ -14,12 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 class MainController(private val mainInteractor: MainInteractor) {
 
     @GetMapping("/index")
-    fun index(): IndexResponse = IndexResponse(
-            mainInteractor.getUsers(),
-            "",
-            mainInteractor.getConversations(),
-            ""
-    )
+    fun index(): IndexResponse = IndexResponse("App is running", "use api endpoints")
 
     @GetMapping("/conversations")
     fun conversations(): ConversationsResponse {

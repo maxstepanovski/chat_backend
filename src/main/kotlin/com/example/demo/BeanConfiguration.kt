@@ -1,8 +1,6 @@
 package com.example.demo
 
-import com.example.demo.data.AuthorityRepository
-import com.example.demo.data.ConversationRepository
-import com.example.demo.data.UserRepository
+import com.example.demo.data.*
 import com.example.demo.domain.AuthInteractor
 import com.example.demo.domain.MainInteractor
 import io.jsonwebtoken.SignatureAlgorithm
@@ -39,10 +37,18 @@ class BeanConfiguration {
 
     @Bean
     fun mainRepository(
-            dataSource: DataSource,
             conversationRepository: ConversationRepository,
-            userRepository: UserRepository
-    ) = MainInteractor(dataSource, conversationRepository, userRepository)
+            conversationMessageRepository: ConversationMessageRepository,
+            messageRepository: MessageRepository,
+            userRepository: UserRepository,
+            userConversationRepository: UserConversationRepository
+    ) = MainInteractor(
+            conversationRepository,
+            userConversationRepository,
+            messageRepository,
+            conversationMessageRepository,
+            userRepository
+    )
 
     @Bean
     fun jwtSecretKey(): SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512)
