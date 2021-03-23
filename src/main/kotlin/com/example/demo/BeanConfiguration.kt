@@ -32,11 +32,10 @@ class BeanConfiguration {
 
     @Bean
     fun authRepository(
-            dataSource: DataSource,
             passwordEncoder: PasswordEncoder,
             authorityRepository: AuthorityRepository,
             userRepository: UserRepository
-    ) = AuthInteractor(dataSource, passwordEncoder, authorityRepository, userRepository)
+    ) = AuthInteractor(passwordEncoder, authorityRepository, userRepository)
 
     @Bean
     fun mainRepository(

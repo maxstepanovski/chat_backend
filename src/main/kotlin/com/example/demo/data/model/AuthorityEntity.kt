@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(schema = "authentication", name = "authority")
 data class AuthorityEntity(
         @Id
-        @GeneratedValue(strategy = GenerationType.TABLE)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id")
         var id: Long,
 
