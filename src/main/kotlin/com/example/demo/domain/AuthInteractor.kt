@@ -1,13 +1,17 @@
-package com.example.demo.data
+package com.example.demo.domain
 
 import com.example.demo.Role
+import com.example.demo.data.AuthorityRepository
+import com.example.demo.data.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.sql.Connection
 import javax.sql.DataSource
 
-class AuthRepository constructor(
+class AuthInteractor constructor(
         private val dataSource: DataSource,
-        private val passwordEncoder: PasswordEncoder
+        private val passwordEncoder: PasswordEncoder,
+        private val authorityRepository: AuthorityRepository,
+        private val userRepository: UserRepository
 ) {
 
     fun createUser(userName: String, userPassword: String): Boolean {

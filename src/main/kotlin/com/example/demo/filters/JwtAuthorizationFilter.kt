@@ -2,7 +2,7 @@ package com.example.demo.filters
 
 import com.example.demo.AUTH_PREFIX
 import com.example.demo.ROLE_PREFIX
-import com.example.demo.data.AuthRepository
+import com.example.demo.domain.AuthInteractor
 import io.jsonwebtoken.Jwts
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.AuthenticationManager
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class JwtAuthorizationFilter(
-        private val repository: AuthRepository,
+        private val interactor: AuthInteractor,
         private val secretKey: SecretKey,
         authManager: AuthenticationManager
 ) : BasicAuthenticationFilter(authManager) {
@@ -49,7 +49,7 @@ class JwtAuthorizationFilter(
                 return null
             }
 
-            val authorities = repository.readUserAuthorities(userName).map { SimpleGrantedAuthority("$ROLE_PREFIX$it") }
+            val authorities = interactor.readUserAuthorities(userName).map { SimpleGrantedAuthority("$ROLE_PREFIX$it") }
 
             return UsernamePasswordAuthenticationToken(userName, null, authorities)
         } catch (ex: Throwable) {

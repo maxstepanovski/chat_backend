@@ -1,7 +1,10 @@
 package com.example.demo
 
-import com.example.demo.data.AuthRepository
-import com.example.demo.data.MainRepository
+import com.example.demo.data.AuthorityRepository
+import com.example.demo.data.ConversationRepository
+import com.example.demo.data.UserRepository
+import com.example.demo.domain.AuthInteractor
+import com.example.demo.domain.MainInteractor
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.postgresql.ds.PGSimpleDataSource
@@ -28,10 +31,19 @@ class BeanConfiguration {
     }
 
     @Bean
-    fun authRepository(dataSource: DataSource, passwordEncoder: PasswordEncoder) = AuthRepository(dataSource, passwordEncoder)
+    fun authRepository(
+            dataSource: DataSource,
+            passwordEncoder: PasswordEncoder,
+            authorityRepository: AuthorityRepository,
+            userRepository: UserRepository
+    ) = AuthInteractor(dataSource, passwordEncoder, authorityRepository, userRepository)
 
     @Bean
-    fun mainRepository(dataSource: DataSource) = MainRepository(dataSource)
+    fun mainRepository(
+            dataSource: DataSource,
+            conversationRepository: ConversationRepository,
+            userRepository: UserRepository
+    ) = MainInteractor(dataSource, conversationRepository, userRepository)
 
     @Bean
     fun jwtSecretKey(): SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512)

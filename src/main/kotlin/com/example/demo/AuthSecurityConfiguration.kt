@@ -1,6 +1,6 @@
 package com.example.demo
 
-import com.example.demo.data.AuthRepository
+import com.example.demo.domain.AuthInteractor
 import com.example.demo.filters.JwtAuthenticationFilter
 import com.example.demo.filters.JwtAuthorizationFilter
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,7 +33,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
     lateinit var secretKey: SecretKey
 
     @Autowired
-    lateinit var authRepository: AuthRepository
+    lateinit var authInteractor: AuthInteractor
 
     @Autowired
     lateinit var dataSource: DataSource
@@ -72,7 +72,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 )
                 .addFilter(
                         JwtAuthorizationFilter(
-                                authRepository, secretKey, authenticationManager()
+                                authInteractor, secretKey, authenticationManager()
                         )
                 )
                 .sessionManagement()
