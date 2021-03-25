@@ -46,8 +46,6 @@ class MainInteractor(
     }
 
     fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
-        val principal1 = userRepository.findByUserName(principalName)
-        val doesExist = userRepository.existsByUserName(principalName)
         val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
