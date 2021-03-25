@@ -16,31 +16,33 @@ class MainInteractor(
         private val userRepository: UserRepository
 ) {
 
-    fun getSelf(principalName: String): UserResponse {
-        val user = userRepository.findByUserName(principalName)
-        return UserResponse(
-                user.id,
-                user.userName
-        )
-    }
-
     fun getUserConversations(userName: String): List<ConversationResponse> {
         val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }
         return conversationRepository.findAllById(conversationIds).map { ConversationResponse(it.id, it.name) }
     }
 
-    fun getConversationUsers(conversationId: Long): List<UserResponse> {
+    fun getMessages(principalName: String, conversationId: Long, page: Int): MessagesResponse {
+        val principal = userRepository.findByUserName(principalName)
+        val messageIdsPage = conversationMessageRepository.findAllByConversationId(conversationId, PageRequest.of(page, 10))
         val userIds = userConversationRepository.findAllByConversationId(conversationId).map { it.userId }
         val users = userRepository.findAllById(userIds)
-        return users.map { UserResponse(it.id, it.userName) }
-    }
-
-    fun getMessages(conversationId: Long, page: Int): MessagesResponse {
-        val messageIdsPage = conversationMessageRepository.findAllByConversationId(conversationId, PageRequest.of(page, 10))
+        val userMap = mutableMapOf<Long, UserEntity>().apply {
+            users.forEach {
+                this[it.id] = it
+            }
+        }
         val messageIds = messageIdsPage.content.map { it.messageId }
         val messages = messageRepository.findAllById(messageIds)
-                .map { MessageResponse(it.id, it.text, it.time, it.userId) }
+                .map {
+                    MessageResponse(
+                            it.id,
+                            it.text,
+                            it.time,
+                            userMap[it.userId]?.userName.orEmpty(),
+                            principal.id == it.userId
+                    )
+                }
         return MessagesResponse(
                 messages,
                 page,

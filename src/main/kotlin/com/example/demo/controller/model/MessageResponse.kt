@@ -12,6 +12,9 @@ data class MessageResponse(
         @JsonProperty(value = "time")
         val time: Long,
 
-        @JsonProperty(value = "user_id")
-        val userId: Long
+        @JsonProperty(value = "sender_name")
+        val senderName: String,
+
+        @JsonProperty(value = "is_principal")
+        val isPrincipal: Boolean
 )

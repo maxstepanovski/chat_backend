@@ -11,11 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MainController(private val mainInteractor: MainInteractor) {
 
-    @GetMapping("/user/self")
-    fun self(): UserResponse = mainInteractor.getSelf(
-            SecurityContextHolder.getContext().authentication.principal as String
-    )
-
     @GetMapping("/user/conversations")
     fun conversations(): ConversationsResponse {
         return ConversationsResponse(
@@ -23,18 +18,14 @@ class MainController(private val mainInteractor: MainInteractor) {
         )
     }
 
-    @GetMapping("/user/conversation_users")
-    fun conversationUsers(
-            @RequestParam(name = "conversation_id") conversationId: Long
-    ): ConversationUsersResponse = ConversationUsersResponse(
-            mainInteractor.getConversationUsers(conversationId)
-    )
-
     @GetMapping("/user/messages")
     fun messages(
             @RequestParam(name = "page") page: Int,
             @RequestParam(name = "conversation_id") conversationId: Long
-    ): MessagesResponse = mainInteractor.getMessages(conversationId, page)
+    ): MessagesResponse {
+        val principalName = SecurityContextHolder.getContext().authentication.principal as String
+        return mainInteractor.getMessages(principalName, conversationId, page)
+    }
 
     @PostMapping("/user/create_conversation")
     fun createConversation(
