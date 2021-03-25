@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MainController(private val mainInteractor: MainInteractor) {
 
+    @GetMapping("/user/self")
+    fun self(): UserResponse = mainInteractor.getSelf(
+            SecurityContextHolder.getContext().authentication.principal as String
+    )
+
     @GetMapping("/user/conversations")
     fun conversations(): ConversationsResponse {
         return ConversationsResponse(

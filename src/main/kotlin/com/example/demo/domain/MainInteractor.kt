@@ -16,6 +16,14 @@ class MainInteractor(
         private val userRepository: UserRepository
 ) {
 
+    fun getSelf(principalName: String): UserResponse {
+        val user = userRepository.findByUserName(principalName)
+        return UserResponse(
+                user.id,
+                user.userName
+        )
+    }
+
     fun getUserConversations(userName: String): List<ConversationResponse> {
         val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }
