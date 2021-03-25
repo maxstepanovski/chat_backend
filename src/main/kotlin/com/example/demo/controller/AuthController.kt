@@ -1,5 +1,6 @@
 package com.example.demo.controller
 
+import com.example.demo.controller.model.IndexResponse
 import com.example.demo.domain.AuthInteractor
 import com.example.demo.controller.model.RegistrationResponse
 import com.example.demo.controller.model.UserExistsResponse
@@ -21,4 +22,7 @@ class AuthController(private val authInteractor: AuthInteractor) {
     fun isUserExist(
             @RequestParam(name = "user_name") userName: String
     ): UserExistsResponse = UserExistsResponse(authInteractor.isUserExists(userName))
+
+    @GetMapping("/index")
+    fun index(): IndexResponse = IndexResponse("App is running", "use api endpoints")
 }

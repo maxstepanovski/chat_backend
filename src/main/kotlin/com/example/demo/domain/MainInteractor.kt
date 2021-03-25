@@ -16,7 +16,7 @@ class MainInteractor(
 ) {
 
     fun getUserConversations(userName: String): List<ConversationResponse> {
-        val user = userRepository.findByName(userName)
+        val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }
         return conversationRepository.findAllById(conversationIds).map { ConversationResponse(it.id, it.name) }
     }
@@ -35,8 +35,8 @@ class MainInteractor(
 
     fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Boolean {
         val conversation = conversationRepository.save(ConversationEntity(0, conversationTitle.orEmpty()))
-        val user = userRepository.findByName(userName)
-        val principal = userRepository.findByName(principalName)
+        val user = userRepository.findByUserName(userName)
+        val principal = userRepository.findByUserName(principalName)
 
         userConversationRepository.save(UserConversationEntity(0, user.id, conversation.id))
         userConversationRepository.save(UserConversationEntity(0, principal.id, conversation.id))
@@ -45,8 +45,10 @@ class MainInteractor(
         return true
     }
 
-    fun sendMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
-        val principal = userRepository.findByName(principalName)
+    fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
+        val principal1 = userRepository.findByUserName(principalName)
+        val doesExist = userRepository.existsByUserName(principalName)
+        val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
         return true

@@ -28,7 +28,7 @@ class AuthInteractor constructor(
 
     fun readUserAuthorities(userName: String): MutableList<String> {
         val result = mutableListOf<String>()
-        val user = userRepository.findByName(userName)
+        val user = userRepository.findByUserName(userName)
         val authorities = authorityRepository.findByUserId(user.id)
         authorities.forEach {
             result.add(it.authority)
@@ -37,7 +37,7 @@ class AuthInteractor constructor(
     }
 
     fun isUserExists(userName: String): Boolean {
-        return userRepository.existsByName(userName)
+        return userRepository.existsByUserName(userName)
     }
 
     private fun createUserRecord(userName: String, userPassword: String) {

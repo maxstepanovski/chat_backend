@@ -83,9 +83,7 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/register").permitAll()
                 .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
-                .antMatchers("/${Role.USER.alias}/*").hasRole(Role.USER.alias)
-                .antMatchers("/common/*").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
-                .antMatchers("/conversations").hasAnyRole(Role.ADMIN.alias, Role.USER.alias)
+                .antMatchers("/${Role.USER.alias}/*").hasAnyRole(Role.USER.alias, Role.ADMIN.alias)
     }
 }
 
