@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserConversationRepository: JpaRepository<UserConversationEntity, Long> {
 
     fun findAllByUserId(userId: Long): List<UserConversationEntity>
+
+    fun findAllByConversationId(conversationId: Long): List<UserConversationEntity>
 }

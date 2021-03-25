@@ -1,9 +1,6 @@
 package com.example.demo.controller
 
-import com.example.demo.controller.model.ConversationsResponse
-import com.example.demo.controller.model.IndexResponse
-import com.example.demo.controller.model.MessagesResponse
-import com.example.demo.controller.model.NewMessageResponse
+import com.example.demo.controller.model.*
 import com.example.demo.domain.MainInteractor
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,6 +17,13 @@ class MainController(private val mainInteractor: MainInteractor) {
                 mainInteractor.getUserConversations(SecurityContextHolder.getContext().authentication.principal as String)
         )
     }
+
+    @GetMapping("/user/conversation_users")
+    fun conversationUsers(
+            @RequestParam(name = "conversation_id") conversationId: Long
+    ): ConversationUsersResponse = ConversationUsersResponse(
+            mainInteractor.getConversationUsers(conversationId)
+    )
 
     @GetMapping("/user/messages")
     fun messages(

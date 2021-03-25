@@ -3,6 +3,7 @@ package com.example.demo.domain
 import com.example.demo.controller.model.ConversationResponse
 import com.example.demo.controller.model.MessageResponse
 import com.example.demo.controller.model.MessagesResponse
+import com.example.demo.controller.model.UserResponse
 import com.example.demo.data.*
 import com.example.demo.data.model.*
 import org.springframework.data.domain.PageRequest
@@ -19,6 +20,12 @@ class MainInteractor(
         val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }
         return conversationRepository.findAllById(conversationIds).map { ConversationResponse(it.id, it.name) }
+    }
+
+    fun getConversationUsers(conversationId: Long): List<UserResponse> {
+        val userIds = userConversationRepository.findAllByConversationId(conversationId).map { it.userId }
+        val users = userRepository.findAllById(userIds)
+        return users.map { UserResponse(it.id, it.userName) }
     }
 
     fun getMessages(conversationId: Long, page: Int): MessagesResponse {
