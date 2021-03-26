@@ -20,11 +20,12 @@ class MainController(private val mainInteractor: MainInteractor) {
 
     @GetMapping("/user/messages")
     fun messages(
-            @RequestParam(name = "page") page: Int,
-            @RequestParam(name = "conversation_id") conversationId: Long
+            @RequestParam(name = "conversation_id") conversationId: Long,
+            @RequestParam(name = "page_size") pageSize: Int,
+            @RequestParam(name = "last_message_id") lastMessageId: Long
     ): MessagesResponse {
         val principalName = SecurityContextHolder.getContext().authentication.principal as String
-        return mainInteractor.getMessages(principalName, conversationId, page)
+        return mainInteractor.getMessages(principalName, conversationId, pageSize, lastMessageId)
     }
 
     @PostMapping("/user/create_conversation")

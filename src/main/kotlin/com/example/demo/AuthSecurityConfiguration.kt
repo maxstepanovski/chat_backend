@@ -93,4 +93,4 @@ enum class Role(val alias: String) {
 
 const val AUTH_PREFIX = "Bearer "
 const val ROLE_PREFIX = "ROLE_"
-const val TOKEN_LIFESPAN_MS = 600_000
+const val TOKEN_LIFESPAN_MS:Long = 600_000_000_000

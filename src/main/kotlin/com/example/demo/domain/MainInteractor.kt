@@ -22,9 +22,24 @@ class MainInteractor(
         return conversationRepository.findAllById(conversationIds).map { ConversationResponse(it.id, it.name) }
     }
 
-    fun getMessages(principalName: String, conversationId: Long, page: Int): MessagesResponse {
-        val principal = userRepository.findByUserName(principalName)
-        val messageIdsPage = conversationMessageRepository.findAllByConversationId(conversationId, PageRequest.of(page, 10))
+    fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
+        // find all message ids which satisfy constraints
+        val messageIds = if (lastMessageId < 0) {
+            conversationMessageRepository.findAllByConversationId(conversationId, pageSize)
+        } else {
+            conversationMessageRepository.findAllByConversationId(conversationId, lastMessageId, pageSize)
+        }.map {
+            it.messageId
+        }
+
+        // check if there's more messages which satisfy constraints
+        val hasMore = if (messageIds.size < pageSize) {
+            false
+        } else {
+            conversationMessageRepository.existsWithIdLessThan(conversationId, messageIds.last())
+        }
+
+        // find all users who take part in conversation
         val userIds = userConversationRepository.findAllByConversationId(conversationId).map { it.userId }
         val users = userRepository.findAllById(userIds)
         val userMap = mutableMapOf<Long, UserEntity>().apply {
@@ -32,7 +47,9 @@ class MainInteractor(
                 this[it.id] = it
             }
         }
-        val messageIds = messageIdsPage.content.map { it.messageId }
+
+        // form the final response
+        val principal = userRepository.findByUserName(principalName)
         val messages = messageRepository.findAllById(messageIds)
                 .map {
                     MessageResponse(
@@ -45,8 +62,7 @@ class MainInteractor(
                 }
         return MessagesResponse(
                 messages,
-                page,
-                messageIdsPage.totalPages > page + 1
+                hasMore
         )
     }
 
