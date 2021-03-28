@@ -15,7 +15,7 @@ class AuthInteractor constructor(
 
     fun createUser(userName: String, userPassword: String): Boolean {
         try {
-            if (isUserExists(userName)) {
+            if (userRepository.existsByUserName(userName)) {
                 return false
             }
             createUserRecord(userName, userPassword)
@@ -34,10 +34,6 @@ class AuthInteractor constructor(
             result.add(it.authority)
         }
         return result
-    }
-
-    fun isUserExists(userName: String): Boolean {
-        return userRepository.existsByUserName(userName)
     }
 
     private fun createUserRecord(userName: String, userPassword: String) {

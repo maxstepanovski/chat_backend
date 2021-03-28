@@ -16,6 +16,8 @@ class MainInteractor(
         private val userRepository: UserRepository
 ) {
 
+    fun isUserExists(userName: String): Boolean = userRepository.existsByUserName(userName)
+
     fun getUserConversations(userName: String): List<ConversationResponse> {
         val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }

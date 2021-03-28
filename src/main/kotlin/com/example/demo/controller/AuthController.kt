@@ -18,11 +18,6 @@ class AuthController(private val authInteractor: AuthInteractor) {
             @RequestParam(name = "user_password") userPassword: String
     ): RegistrationResponse = RegistrationResponse(authInteractor.createUser(userName, userPassword))
 
-    @GetMapping("/user_exists")
-    fun isUserExist(
-            @RequestParam(name = "user_name") userName: String
-    ): UserExistsResponse = UserExistsResponse(authInteractor.isUserExists(userName))
-
     @GetMapping("/index")
     fun index(): IndexResponse = IndexResponse("App is running", "use api endpoints")
 }

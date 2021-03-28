@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class MainController(private val mainInteractor: MainInteractor) {
 
+    @GetMapping("/user/exists")
+    fun isUserExist(
+            @RequestParam(name = "user_name") userName: String
+    ): UserExistsResponse = UserExistsResponse(mainInteractor.isUserExists(userName))
+
     @GetMapping("/user/conversations")
     fun conversations(): ConversationsResponse {
         return ConversationsResponse(
