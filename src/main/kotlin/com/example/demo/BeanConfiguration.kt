@@ -41,13 +41,15 @@ class BeanConfiguration {
             conversationMessageRepository: ConversationMessageRepository,
             messageRepository: MessageRepository,
             userRepository: UserRepository,
-            userConversationRepository: UserConversationRepository
+            userConversationRepository: UserConversationRepository,
+            userFirebaseTokenRepository: UserFirebaseTokenRepository
     ) = MainInteractor(
             conversationRepository,
             userConversationRepository,
             messageRepository,
             conversationMessageRepository,
-            userRepository
+            userRepository,
+            userFirebaseTokenRepository
     )
 
     @Bean

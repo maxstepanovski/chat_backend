@@ -55,4 +55,11 @@ class MainController(private val mainInteractor: MainInteractor) {
                 mainInteractor.createMessage(principalName, message, conversationId)
         )
     }
+
+    @PostMapping("/user/firebase_token")
+    fun firebaseToken(
+            @RequestParam(name = "token") token: String
+    ): FirebaseTokenResponse = FirebaseTokenResponse(
+            mainInteractor.saveFirebaseToken(SecurityContextHolder.getContext().authentication.principal as String, token)
+    )
 }

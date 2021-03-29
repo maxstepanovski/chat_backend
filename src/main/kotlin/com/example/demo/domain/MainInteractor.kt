@@ -3,17 +3,16 @@ package com.example.demo.domain
 import com.example.demo.controller.model.ConversationResponse
 import com.example.demo.controller.model.MessageResponse
 import com.example.demo.controller.model.MessagesResponse
-import com.example.demo.controller.model.UserResponse
 import com.example.demo.data.*
 import com.example.demo.data.model.*
-import org.springframework.data.domain.PageRequest
 
 class MainInteractor(
         private val conversationRepository: ConversationRepository,
         private val userConversationRepository: UserConversationRepository,
         private val messageRepository: MessageRepository,
         private val conversationMessageRepository: ConversationMessageRepository,
-        private val userRepository: UserRepository
+        private val userRepository: UserRepository,
+        private val userFirebaseTokenRepository: UserFirebaseTokenRepository
 ) {
 
     fun isUserExists(userName: String): Boolean = userRepository.existsByUserName(userName)
@@ -107,5 +106,16 @@ class MainInteractor(
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
         return true
+    }
+
+    fun saveFirebaseToken(principalName: String, token: String): Boolean {
+        val principal = userRepository.findByUserName(principalName)
+        val tokens = userFirebaseTokenRepository.findAllByUserId(principal.id).map { it.firebaseToken }.toSet()
+        return if (tokens.contains(token) || token.isEmpty()) {
+            false
+        } else {
+            userFirebaseTokenRepository.save(UserFirebaseTokenEntity(0, principal.id, token))
+            true
+        }
     }
 }
