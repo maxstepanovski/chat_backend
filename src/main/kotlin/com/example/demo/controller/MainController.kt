@@ -38,9 +38,9 @@ class MainController(private val mainInteractor: MainInteractor) {
             @RequestParam(name = "user_name") userName: String,
             @RequestParam(name = "message") message: String,
             @RequestParam(name = "conversation_title") conversationTitle: String?
-    ): NewMessageResponse {
+    ): NewConversationResponse {
         val principalName = SecurityContextHolder.getContext().authentication.principal as String
-        return NewMessageResponse(
+        return NewConversationResponse(
                 mainInteractor.createConversation(principalName, userName, message, conversationTitle)
         )
     }

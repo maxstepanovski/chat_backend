@@ -7,5 +7,8 @@ data class ConversationResponse(
         val id: Long,
 
         @JsonProperty(value = "name")
-        val name: String
+        val name: String,
+
+        @JsonProperty(value = "last_message")
+        val lastMessage: MessageResponse
 )

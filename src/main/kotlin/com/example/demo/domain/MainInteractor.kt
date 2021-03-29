@@ -19,9 +19,31 @@ class MainInteractor(
     fun isUserExists(userName: String): Boolean = userRepository.existsByUserName(userName)
 
     fun getUserConversations(userName: String): List<ConversationResponse> {
+        val result = mutableListOf<ConversationResponse>()
+
         val user = userRepository.findByUserName(userName)
         val conversationIds = userConversationRepository.findAllByUserId(user.id).map { it.conversationId }
-        return conversationRepository.findAllById(conversationIds).map { ConversationResponse(it.id, it.name) }
+
+        conversationRepository.findAllById(conversationIds).forEach {
+            val lastMessageId = conversationMessageRepository.findLatestByConversationId(it.id).messageId
+            val lastMessage = messageRepository.findById(lastMessageId).get()
+            val messageOwner = userRepository.findById(lastMessage.userId).get()
+            result.add(
+                    ConversationResponse(
+                            it.id,
+                            it.name,
+                            MessageResponse(
+                                    lastMessage.id,
+                                    lastMessage.text,
+                                    lastMessage.time,
+                                    messageOwner.userName,
+                                    messageOwner.userName == user.userName
+                            )
+                    )
+            )
+        }
+
+        return result
     }
 
     fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
@@ -68,7 +90,7 @@ class MainInteractor(
         )
     }
 
-    fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Boolean {
+    fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Long {
         val conversation = conversationRepository.save(ConversationEntity(0, conversationTitle.orEmpty()))
         val user = userRepository.findByUserName(userName)
         val principal = userRepository.findByUserName(principalName)
@@ -77,7 +99,7 @@ class MainInteractor(
         userConversationRepository.save(UserConversationEntity(0, principal.id, conversation.id))
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversation.id, message.id))
-        return true
+        return conversation.id
     }
 
     fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
