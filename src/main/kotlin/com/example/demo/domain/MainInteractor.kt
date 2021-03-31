@@ -5,8 +5,10 @@ import com.example.demo.controller.model.MessageResponse
 import com.example.demo.controller.model.MessagesResponse
 import com.example.demo.data.*
 import com.example.demo.data.model.*
+import com.example.demo.domain.model.PushNotification
 
 class MainInteractor(
+        private val fcmInteractor: FcmInteractor,
         private val conversationRepository: ConversationRepository,
         private val userConversationRepository: UserConversationRepository,
         private val messageRepository: MessageRepository,
@@ -105,6 +107,19 @@ class MainInteractor(
         val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
+        userConversationRepository
+                .findAllByConversationId(conversationId)
+                .map { it.userId }
+                .filter { it != principal.id }
+                .forEach { userId ->
+                    userFirebaseTokenRepository
+                            .findAllByUserId(userId)
+                            .map { it.firebaseToken }
+                            .forEach {
+                                fcmInteractor.sendNotification(PushNotification(principalName, messageText), it)
+                            }
+                }
+
         return true
     }
 
