@@ -63,5 +63,5 @@ class BeanConfiguration {
     fun jwtSecretKey(): SecretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512)
 
     @Bean
-    fun fcmInteractor(): FcmInteractor = FcmInteractor("src/main/resources/fcm.json")
+    fun fcmInteractor(): FcmInteractor = FcmInteractor()
 }

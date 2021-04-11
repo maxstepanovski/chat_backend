@@ -125,12 +125,8 @@ class MainInteractor(
 
     fun saveFirebaseToken(principalName: String, token: String): Boolean {
         val principal = userRepository.findByUserName(principalName)
-        val tokens = userFirebaseTokenRepository.findAllByUserId(principal.id).map { it.firebaseToken }.toSet()
-        return if (tokens.contains(token) || token.isEmpty()) {
-            false
-        } else {
-            userFirebaseTokenRepository.save(UserFirebaseTokenEntity(0, principal.id, token))
-            true
-        }
+        userFirebaseTokenRepository.deleteAllByUserId(principal.id)
+        userFirebaseTokenRepository.save(UserFirebaseTokenEntity(0, principal.id, token))
+        return true
     }
 }
