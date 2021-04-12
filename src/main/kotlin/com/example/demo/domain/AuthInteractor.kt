@@ -6,14 +6,16 @@ import com.example.demo.data.UserRepository
 import com.example.demo.data.model.AuthorityEntity
 import com.example.demo.data.model.UserEntity
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 
-class AuthInteractor constructor(
+open class AuthInteractor constructor(
         private val passwordEncoder: PasswordEncoder,
         private val authorityRepository: AuthorityRepository,
         private val userRepository: UserRepository
 ) {
 
-    fun createUser(userName: String, userPassword: String): Boolean {
+    @Transactional
+    open fun createUser(userName: String, userPassword: String): Boolean {
         try {
             if (userRepository.existsByUserName(userName)) {
                 return false
@@ -26,7 +28,8 @@ class AuthInteractor constructor(
         }
     }
 
-    fun readUserAuthorities(userName: String): MutableList<String> {
+    @Transactional
+    open fun readUserAuthorities(userName: String): MutableList<String> {
         val result = mutableListOf<String>()
         val user = userRepository.findByUserName(userName)
         val authorities = authorityRepository.findByUserId(user.id)

@@ -6,8 +6,9 @@ import com.example.demo.controller.model.MessagesResponse
 import com.example.demo.data.*
 import com.example.demo.data.model.*
 import com.example.demo.domain.model.PushNotification
+import org.springframework.transaction.annotation.Transactional
 
-class MainInteractor(
+open class MainInteractor(
         private val fcmInteractor: FcmInteractor,
         private val conversationRepository: ConversationRepository,
         private val userConversationRepository: UserConversationRepository,
@@ -19,7 +20,8 @@ class MainInteractor(
 
     fun isUserExists(userName: String): Boolean = userRepository.existsByUserName(userName)
 
-    fun getUserConversations(userName: String): List<ConversationResponse> {
+    @Transactional
+    open fun getUserConversations(userName: String): List<ConversationResponse> {
         val result = mutableListOf<ConversationResponse>()
 
         val user = userRepository.findByUserName(userName)
@@ -47,7 +49,8 @@ class MainInteractor(
         return result
     }
 
-    fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
+    @Transactional
+    open fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
         // find all message ids which satisfy constraints
         val messageIds = if (lastMessageId < 0) {
             conversationMessageRepository.findAllByConversationId(conversationId, pageSize)
@@ -91,7 +94,8 @@ class MainInteractor(
         )
     }
 
-    fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Long {
+    @Transactional
+    open fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Long {
         val conversation = conversationRepository.save(ConversationEntity(0, conversationTitle.orEmpty()))
         val user = userRepository.findByUserName(userName)
         val principal = userRepository.findByUserName(principalName)
@@ -103,7 +107,8 @@ class MainInteractor(
         return conversation.id
     }
 
-    fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
+    @Transactional
+    open fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
         val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
@@ -123,10 +128,10 @@ class MainInteractor(
         return true
     }
 
-    fun saveFirebaseToken(principalName: String, token: String): Boolean {
+    @Transactional
+    open fun saveFirebaseToken(principalName: String, token: String): Boolean {
         val principal = userRepository.findByUserName(principalName)
-        userFirebaseTokenRepository.deleteAllByUserId(principal.id)
-        userFirebaseTokenRepository.save(UserFirebaseTokenEntity(0, principal.id, token))
+        userFirebaseTokenRepository.insertWithReplace(principal.id, token)
         return true
     }
 }
