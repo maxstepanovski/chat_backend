@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation("com.google.firebase:firebase-admin:6.7.0")
     implementation("org.postgresql:postgresql:42.2.6")
+    implementation("org.flywaydb:flyway-core:7.13.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
