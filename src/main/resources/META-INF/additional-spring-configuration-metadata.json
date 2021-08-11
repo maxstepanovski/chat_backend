@@ -1,8 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "fcm.file.path",
-      "type": "java.lang.String",
-      "description": "Description for fcm.file.path."
-  }
-] }
