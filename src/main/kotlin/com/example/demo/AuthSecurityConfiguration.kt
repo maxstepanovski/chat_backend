@@ -50,12 +50,12 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .rolePrefix(ROLE_PREFIX)
                 .usersByUsernameQuery(
                         "SELECT user_name, user_password, enabled " +
-                                "FROM authentication.user WHERE user_name = ?"
+                                "FROM public.user WHERE user_name = ?"
                 )
                 .authoritiesByUsernameQuery(
-                        "select authentication.user.user_name, authentication.authority.authority " +
-                                "from authentication.authority, authentication.user " +
-                                "where authentication.authority.user_id = authentication.user.id and user_name = ?"
+                        "select public.user.user_name, public.authority.authority " +
+                                "from public.authority, public.user " +
+                                "where public.authority.user_id = public.user.id and user_name = ?"
                 )
     }
 

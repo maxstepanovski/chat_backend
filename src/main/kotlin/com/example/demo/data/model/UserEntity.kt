@@ -3,7 +3,7 @@ package com.example.demo.data.model
 import javax.persistence.*
 
 @Entity
-@Table(schema = "authentication", name = "user")
+@Table(schema = "public", name = "user")
 data class UserEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
