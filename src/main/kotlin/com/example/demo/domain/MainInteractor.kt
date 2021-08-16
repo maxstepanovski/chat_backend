@@ -8,6 +8,7 @@ import com.example.demo.data.model.*
 import com.example.demo.domain.model.PushNotification
 import org.springframework.transaction.annotation.Transactional
 
+
 open class MainInteractor(
         private val fcmInteractor: FcmInteractor,
         private val conversationRepository: ConversationRepository,
@@ -18,7 +19,9 @@ open class MainInteractor(
         private val userFirebaseTokenRepository: UserFirebaseTokenRepository
 ) {
 
-    fun isUserExists(userName: String): Boolean = userRepository.existsByUserName(userName)
+    @Transactional
+    open fun isUserExists(userName: String): Boolean =
+        userRepository.existsByUserName(userName)
 
     @Transactional
     open fun getUserConversations(userName: String): List<ConversationResponse> {
