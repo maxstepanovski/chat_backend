@@ -1,5 +1,6 @@
 package com.example.demo.domain
 
+import com.example.demo.Opened
 import com.example.demo.controller.model.ConversationResponse
 import com.example.demo.controller.model.MessageResponse
 import com.example.demo.controller.model.MessagesResponse
@@ -8,23 +9,23 @@ import com.example.demo.data.model.*
 import com.example.demo.domain.model.PushNotification
 import org.springframework.transaction.annotation.Transactional
 
-
-open class MainInteractor(
-        private val fcmInteractor: FcmInteractor,
-        private val conversationRepository: ConversationRepository,
-        private val userConversationRepository: UserConversationRepository,
-        private val messageRepository: MessageRepository,
-        private val conversationMessageRepository: ConversationMessageRepository,
-        private val userRepository: UserRepository,
-        private val userFirebaseTokenRepository: UserFirebaseTokenRepository
+@Opened
+class MainInteractor(
+    private val fcmInteractor: FcmInteractor,
+    private val conversationRepository: ConversationRepository,
+    private val userConversationRepository: UserConversationRepository,
+    private val messageRepository: MessageRepository,
+    private val conversationMessageRepository: ConversationMessageRepository,
+    private val userRepository: UserRepository,
+    private val userFirebaseTokenRepository: UserFirebaseTokenRepository
 ) {
 
     @Transactional
-    open fun isUserExists(userName: String): Boolean =
+    fun isUserExists(userName: String): Boolean =
         userRepository.existsByUserName(userName)
 
     @Transactional
-    open fun getUserConversations(userName: String): List<ConversationResponse> {
+    fun getUserConversations(userName: String): List<ConversationResponse> {
         val result = mutableListOf<ConversationResponse>()
 
         val user = userRepository.findByUserName(userName)
@@ -35,17 +36,17 @@ open class MainInteractor(
             val lastMessage = messageRepository.findById(lastMessageId).get()
             val messageOwner = userRepository.findById(lastMessage.userId).get()
             result.add(
-                    ConversationResponse(
-                            it.id,
-                            it.name,
-                            MessageResponse(
-                                    lastMessage.id,
-                                    lastMessage.text,
-                                    lastMessage.time,
-                                    messageOwner.userName,
-                                    messageOwner.userName == user.userName
-                            )
+                ConversationResponse(
+                    it.id,
+                    it.name,
+                    MessageResponse(
+                        lastMessage.id,
+                        lastMessage.text,
+                        lastMessage.time,
+                        messageOwner.userName,
+                        messageOwner.userName == user.userName
                     )
+                )
             )
         }
 
@@ -53,7 +54,7 @@ open class MainInteractor(
     }
 
     @Transactional
-    open fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
+    fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
         // find all message ids which satisfy constraints
         val messageIds = if (lastMessageId < 0) {
             conversationMessageRepository.findAllByConversationId(conversationId, pageSize)
@@ -82,23 +83,28 @@ open class MainInteractor(
         // form the final response
         val principal = userRepository.findByUserName(principalName)
         val messages = messageRepository.findAllById(messageIds)
-                .map {
-                    MessageResponse(
-                            it.id,
-                            it.text,
-                            it.time,
-                            userMap[it.userId]?.userName.orEmpty(),
-                            principal.id == it.userId
-                    )
-                }
+            .map {
+                MessageResponse(
+                    it.id,
+                    it.text,
+                    it.time,
+                    userMap[it.userId]?.userName.orEmpty(),
+                    principal.id == it.userId
+                )
+            }
         return MessagesResponse(
-                messages,
-                hasMore
+            messages,
+            hasMore
         )
     }
 
     @Transactional
-    open fun createConversation(principalName: String, userName: String, messageText: String, conversationTitle: String?): Long {
+    fun createConversation(
+        principalName: String,
+        userName: String,
+        messageText: String,
+        conversationTitle: String?
+    ): Long {
         val conversation = conversationRepository.save(ConversationEntity(0, conversationTitle.orEmpty()))
         val user = userRepository.findByUserName(userName)
         val principal = userRepository.findByUserName(principalName)
@@ -111,28 +117,27 @@ open class MainInteractor(
     }
 
     @Transactional
-    open fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
+    fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
         val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
         userConversationRepository
-                .findAllByConversationId(conversationId)
-                .map { it.userId }
-                .filter { it != principal.id }
-                .forEach { userId ->
-                    userFirebaseTokenRepository
-                            .findAllByUserId(userId)
-                            .map { it.firebaseToken }
-                            .forEach {
-                                fcmInteractor.sendNotification(PushNotification(principalName, messageText), it)
-                            }
-                }
-
+            .findAllByConversationId(conversationId)
+            .map { it.userId }
+            .filter { it != principal.id }
+            .forEach { userId ->
+                userFirebaseTokenRepository
+                    .findAllByUserId(userId)
+                    .map { it.firebaseToken }
+                    .forEach {
+                        fcmInteractor.sendNotification(PushNotification(principalName, messageText), it)
+                    }
+            }
         return true
     }
 
     @Transactional
-    open fun saveFirebaseToken(principalName: String, token: String): Boolean {
+    fun saveFirebaseToken(principalName: String, token: String): Boolean {
         val principal = userRepository.findByUserName(principalName)
         userFirebaseTokenRepository.insertWithReplace(principal.id, token)
         return true
