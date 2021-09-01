@@ -9,6 +9,7 @@ import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.AndroidNotification
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
+import org.springframework.util.ResourceUtils
 import java.io.FileInputStream
 import java.io.IOException
 
@@ -16,7 +17,7 @@ class FcmInteractor {
 
     init {
         try {
-            val stream = FileInputStream("src/main/resources/private_key.json")
+            val stream = FileInputStream(ResourceUtils.getFile("classpath:private_key.json"))
             val firebaseOptions = FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(stream)).build()
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(firebaseOptions)
@@ -28,18 +29,18 @@ class FcmInteractor {
 
     fun sendNotification(notification: PushNotification, token: String): ApiFuture<String> {
         val pushNotification = AndroidNotification.builder()
-                .setTitle(notification.title)
-                .setBody(notification.text)
-                .build()
+            .setTitle(notification.title)
+            .setBody(notification.text)
+            .build()
         val androidConfig = AndroidConfig.builder()
-                .setNotification(pushNotification)
-                .setTtl(60_000)
-                .build()
+            .setNotification(pushNotification)
+            .setTtl(60_000)
+            .build()
         val message = Message.builder()
-                .setToken(token)
-                .setAndroidConfig(androidConfig)
-                .build()
+            .setToken(token)
+            .setAndroidConfig(androidConfig)
+            .build()
         return FirebaseMessaging.getInstance()
-                .sendAsync(message)
+            .sendAsync(message)
     }
 }
