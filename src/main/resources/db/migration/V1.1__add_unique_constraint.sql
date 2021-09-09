@@ -1,0 +1,1 @@
+ALTER TABLE public.user_firebase_token ADD CONSTRAINT unique_user_id UNIQUE (user_id);
