@@ -44,46 +44,46 @@ class AuthSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth
-                .jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(passwordEncoder)
-                .rolePrefix(ROLE_PREFIX)
-                .usersByUsernameQuery(
-                        "SELECT user_name, user_password, enabled " +
-                                "FROM public.user WHERE user_name = ?"
-                )
-                .authoritiesByUsernameQuery(
-                        "select public.user.user_name, public.authority.authority " +
-                                "from public.authority, public.user " +
-                                "where public.authority.user_id = public.user.id and user_name = ?"
-                )
+            .jdbcAuthentication()
+            .dataSource(dataSource)
+            .passwordEncoder(passwordEncoder)
+            .rolePrefix(ROLE_PREFIX)
+            .usersByUsernameQuery(
+                "SELECT user_name, user_password, enabled " +
+                        "FROM public.user WHERE user_name = ?"
+            )
+            .authoritiesByUsernameQuery(
+                "select public.user.user_name, public.authority.authority " +
+                        "from public.authority, public.user " +
+                        "where public.authority.user_id = public.user.id and user_name = ?"
+            )
     }
 
     override fun configure(http: HttpSecurity) {
         http
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .addFilter(
-                        JwtAuthenticationFilter(
-                                jwtAudience, jwtIssuer, jwtType, secretKey, authenticationManager()
-                        )
+            .cors()
+            .and()
+            .csrf()
+            .disable()
+            .addFilter(
+                JwtAuthenticationFilter(
+                    jwtAudience, jwtIssuer, jwtType, secretKey, authenticationManager()
                 )
-                .addFilter(
-                        JwtAuthorizationFilter(
-                                authInteractor, secretKey, authenticationManager()
-                        )
+            )
+            .addFilter(
+                JwtAuthorizationFilter(
+                    authInteractor, secretKey, authenticationManager()
                 )
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/register").permitAll()
-                .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
-                .antMatchers("/${Role.USER.alias}/*").hasAnyRole(Role.USER.alias, Role.ADMIN.alias)
+            )
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers("/").permitAll()
+            .antMatchers(HttpMethod.POST, "/login").permitAll()
+            .antMatchers(HttpMethod.POST, "/register").permitAll()
+            .antMatchers("/${Role.ADMIN.alias}/*").hasRole(Role.ADMIN.alias)
+            .antMatchers("/${Role.USER.alias}/*").hasAnyRole(Role.USER.alias, Role.ADMIN.alias)
     }
 }
 
@@ -93,4 +93,4 @@ enum class Role(val alias: String) {
 
 const val AUTH_PREFIX = "Bearer "
 const val ROLE_PREFIX = "ROLE_"
-const val TOKEN_LIFESPAN_MS:Long = 600_000_000_000
+const val TOKEN_LIFESPAN_MS: Long = 600_000_000_000
