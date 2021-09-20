@@ -39,6 +39,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("com.google.code.gson:gson:2.8.8")
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
