@@ -59,7 +59,7 @@ class MainController(private val mainInteractor: MainInteractor) {
         @RequestParam(name = "conversation_id") conversationId: Long
     ): NewMessageResponse {
         return NewMessageResponse(
-            mainInteractor.createMessage(
+            mainInteractor.createMessageWithNotifications(
                 SecurityContextHolder.getContext().authentication.principal as String,
                 message,
                 conversationId

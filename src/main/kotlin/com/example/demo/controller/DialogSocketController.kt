@@ -1,6 +1,7 @@
 package com.example.demo.controller
 
 import com.example.demo.controller.converter.SocketMessageConverter
+import com.example.demo.controller.model.InfoSocketResponse
 import com.example.demo.controller.model.NewMessageSocketRequest
 import com.example.demo.domain.MainInteractor
 import org.springframework.stereotype.Component
@@ -23,11 +24,20 @@ class DialogSocketController(
         val request = converter.convert(message.payload)
         val principal = session.principal ?: throw RuntimeException("пользователь не авторизован")
         if (request is NewMessageSocketRequest) {
-            mainInteractor.createMessage(
+            val response = mainInteractor.createMessage(
                 principal.name,
                 request.message,
                 request.conversationId
             )
+            mainInteractor.getConversationUsers(request.conversationId)
+                .map {
+                    if (userSessions.containsKey(it.userName)) {
+                        val responseMessage = converter.convert(principal.name, it.userName == principal.name, response)
+                        userSessions[it.userName]?.sendMessage(responseMessage)
+                    } else {
+                        mainInteractor.sendNotification(principal.name, request.message, request.conversationId, it.id)
+                    }
+                }
         } else {
             throw IllegalArgumentException("неверный формат данных")
         }
@@ -41,7 +51,7 @@ class DialogSocketController(
             throw RuntimeException("пользователь не авторизован")
         } else {
             userSessions[principal.name] = session
-            session.sendMessage(TextMessage("соединение установлено"))
+            session.sendMessage(converter.convert(InfoSocketResponse("соединение установлено")))
         }
     }
 

@@ -1,11 +1,11 @@
 package com.example.demo.controller.model
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.gson.annotations.SerializedName
 
 data class NewMessageSocketRequest(
-    @JsonProperty(value = "conversation_id")
+    @SerializedName(value = "conversation_id")
     val conversationId: Long,
 
-    @JsonProperty(value = "message")
+    @SerializedName(value = "message")
     val message: String
-) : BaseSocketRequest(SocketRequestType.NEW_MESSAGE)
+) : SocketRequest(SocketRequestType.NEW_MESSAGE)

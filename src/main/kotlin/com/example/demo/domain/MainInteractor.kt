@@ -54,6 +54,16 @@ class MainInteractor(
     }
 
     @Transactional
+    fun getConversationUsers(conversationId: Long): List<UserEntity> =
+        userConversationRepository.findAllByConversationId(conversationId)
+            .map {
+                it.userId
+            }
+            .let {
+                userRepository.findAllById(it)
+            }
+
+    @Transactional
     fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
         // find all message ids which satisfy constraints
         val messageIds = if (lastMessageId < 0) {
@@ -117,7 +127,7 @@ class MainInteractor(
     }
 
     @Transactional
-    fun createMessage(principalName: String, messageText: String, conversationId: Long): Boolean {
+    fun createMessageWithNotifications(principalName: String, messageText: String, conversationId: Long): Boolean {
         val principal = userRepository.findByUserName(principalName)
         val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
         conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
@@ -134,6 +144,20 @@ class MainInteractor(
                     }
             }
         return true
+    }
+
+    @Transactional
+    fun createMessage(principalName: String, messageText: String, conversationId: Long): MessageEntity {
+        val principal = userRepository.findByUserName(principalName)
+        val message = messageRepository.save(MessageEntity(0, messageText, System.currentTimeMillis(), principal.id))
+        conversationMessageRepository.save(ConversationMessageEntity(0, conversationId, message.id))
+        return message
+    }
+
+    @Transactional
+    fun sendNotification(principalName: String, messageText: String, conversationId: Long, userId: Long) {
+        val token = userFirebaseTokenRepository.findByUserId(userId).firebaseToken
+        fcmInteractor.sendNotification(PushNotification(principalName, messageText), token)
     }
 
     @Transactional

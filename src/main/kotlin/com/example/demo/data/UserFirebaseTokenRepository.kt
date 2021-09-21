@@ -9,6 +9,8 @@ interface UserFirebaseTokenRepository: JpaRepository<UserFirebaseTokenEntity, Lo
 
     fun findAllByUserId(userId: Long): List<UserFirebaseTokenEntity>
 
+    fun findByUserId(userId: Long): UserFirebaseTokenEntity
+
     @Modifying
     @Query("INSERT INTO public.user_firebase_token (user_id, firebase_token) VALUES (?1, ?2) ON CONFLICT (user_id) DO UPDATE SET firebase_token = excluded.firebase_token", nativeQuery = true)
     fun insertWithReplace(userId: Long, token: String)
