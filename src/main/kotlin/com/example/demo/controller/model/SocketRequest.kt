@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 open class SocketRequest(
     @SerializedName(value = "request_type")
-    val requestType: SocketRequestType
+    val requestType: Int
 )

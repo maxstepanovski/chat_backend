@@ -8,4 +8,4 @@ data class NewMessageSocketRequest(
 
     @SerializedName(value = "message")
     val message: String
-) : SocketRequest(SocketRequestType.NEW_MESSAGE)
+) : SocketRequest(SocketRequestType.NEW_MESSAGE.code)

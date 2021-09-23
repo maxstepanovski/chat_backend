@@ -1,9 +1,7 @@
 package com.example.demo.domain
 
 import com.example.demo.Opened
-import com.example.demo.controller.model.ConversationResponse
-import com.example.demo.controller.model.MessageResponse
-import com.example.demo.controller.model.MessagesResponse
+import com.example.demo.controller.model.*
 import com.example.demo.data.*
 import com.example.demo.data.model.*
 import com.example.demo.domain.model.PushNotification
@@ -64,7 +62,7 @@ class MainInteractor(
             }
 
     @Transactional
-    fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesResponse {
+    fun getMessages(principalName: String, conversationId: Long, pageSize: Int, lastMessageId: Long): MessagesSocketResponse {
         // find all message ids which satisfy constraints
         val messageIds = if (lastMessageId < 0) {
             conversationMessageRepository.findAllByConversationId(conversationId, pageSize)
@@ -94,7 +92,7 @@ class MainInteractor(
         val principal = userRepository.findByUserName(principalName)
         val messages = messageRepository.findAllById(messageIds)
             .map {
-                MessageResponse(
+                MessageSocketResponse(
                     it.id,
                     it.text,
                     it.time,
@@ -102,7 +100,7 @@ class MainInteractor(
                     principal.id == it.userId
                 )
             }
-        return MessagesResponse(
+        return MessagesSocketResponse(
             messages,
             hasMore
         )

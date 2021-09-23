@@ -18,6 +18,7 @@ class SocketMessageConverter(private val gson: Gson = GsonBuilder().create()) {
         }
         return when (SocketRequestType.fromInt(json.get("request_type").asInt)) {
             SocketRequestType.NEW_MESSAGE -> gson.fromJson(json, NewMessageSocketRequest::class.java)
+            SocketRequestType.MESSAGES -> gson.fromJson(json, MessagesSocketRequest::class.java)
             else -> UnknownSocketRequest()
         }
     }
@@ -35,5 +36,9 @@ class SocketMessageConverter(private val gson: Gson = GsonBuilder().create()) {
 
     fun convert(infoMessage: InfoSocketResponse): TextMessage {
         return TextMessage(gson.toJson(infoMessage))
+    }
+
+    fun convert(messages: MessagesSocketResponse): TextMessage {
+        return TextMessage(gson.toJson(messages))
     }
 }

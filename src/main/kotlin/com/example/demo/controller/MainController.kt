@@ -1,6 +1,9 @@
 package com.example.demo.controller
 
-import com.example.demo.controller.model.*
+import com.example.demo.controller.model.ConversationsResponse
+import com.example.demo.controller.model.FirebaseTokenResponse
+import com.example.demo.controller.model.NewConversationResponse
+import com.example.demo.controller.model.UserExistsResponse
 import com.example.demo.domain.MainInteractor
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,20 +26,6 @@ class MainController(private val mainInteractor: MainInteractor) {
         )
     }
 
-    @GetMapping("/user/messages")
-    fun messages(
-        @RequestParam(name = "conversation_id") conversationId: Long,
-        @RequestParam(name = "page_size") pageSize: Int,
-        @RequestParam(name = "last_message_id") lastMessageId: Long
-    ): MessagesResponse {
-        return mainInteractor.getMessages(
-            SecurityContextHolder.getContext().authentication.principal as String,
-            conversationId,
-            pageSize,
-            lastMessageId
-        )
-    }
-
     @PostMapping("/user/create_conversation")
     fun createConversation(
         @RequestParam(name = "user_name") userName: String,
@@ -49,20 +38,6 @@ class MainController(private val mainInteractor: MainInteractor) {
                 userName,
                 message,
                 conversationTitle
-            )
-        )
-    }
-
-    @PostMapping("/user/create_message")
-    fun createMessage(
-        @RequestParam(name = "message") message: String,
-        @RequestParam(name = "conversation_id") conversationId: Long
-    ): NewMessageResponse {
-        return NewMessageResponse(
-            mainInteractor.createMessageWithNotifications(
-                SecurityContextHolder.getContext().authentication.principal as String,
-                message,
-                conversationId
             )
         )
     }
