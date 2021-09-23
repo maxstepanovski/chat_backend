@@ -1,2 +1,2 @@
 # chat_backend
-A backend chat application with Authorization/Authentication and websocket conversations WITHOUT STOMP
+A Spring Boot backend chat application with Authorization/Authentication and websocket conversations WITHOUT STOMP
